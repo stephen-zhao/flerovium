@@ -2,6 +2,7 @@
   "name": "oganesson",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.18.1"
+    "lerna": "^3.18.1",
+    "typescript": "^3.6.4"
   }
 }
