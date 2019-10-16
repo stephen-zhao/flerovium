@@ -1,0 +1,11 @@
+.npmrc
+.DS_Store
+/node_modules
+/.github/actions/*/node_modules
+/packages/*/node_modules
+/packages/*/lib
+/packages/*/LICENSE
+*.log
+*.cache
+/package-lock.json
+/packages/*/package-lock.json
