@@ -1,0 +1,10 @@
+{
+  "name": "@flerovium/adt",
+  "version": "0.1.0",
+  "description": "Flerovium library of algebraic data types and data structures",
+  "main": "index.js",
+  "repository": "https://github.com/stephen-zhao/flerovium/tree/master/packages/flerovium-adt",
+  "author": "Stephen Zhao <mail@zhaostephen.com>",
+  "license": "MIT",
+  "private": false
+}
