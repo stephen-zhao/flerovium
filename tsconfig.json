@@ -4,6 +4,7 @@
     "target": "es5",
     "sourceMap": true,
     "strict": true,
+    "declaration": true,
     "allowSyntheticDefaultImports": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
