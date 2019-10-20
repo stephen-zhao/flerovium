@@ -3,6 +3,16 @@
   "private": true,
   "devDependencies": {
     "lerna": "^3.18.1",
+    "prettier": "^1.18.2",
+    "tslint": "^5.20.0",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.6.4"
+  },
+  "scripts": {
+    "build": "lerna exec yarn run build",
+    "connect": "lerna bootstrap",
+    "clean": "lerna clean && lerna exec yarn run clean",
+    "format": "lerna exec yarn run format",
+    "lint": "lerna exec yarn run lint"
   }
 }
