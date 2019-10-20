@@ -6,7 +6,7 @@ export interface IMonoid<A> extends ISemigroup<A> {
 }
 export interface IMonoidClass<A, IMonoidA extends IMonoid<A>>
   extends Constructor<IMonoidA>, ISemigroupClass<A, IMonoidA> {
-  'fantasy-land/empty': () => IMonoidA;
+  'fantasy-land/empty': () => IMonoid<any>;
 }
 
 export const RightIdentity: <A, IMonoidA extends IMonoid<A>>(
