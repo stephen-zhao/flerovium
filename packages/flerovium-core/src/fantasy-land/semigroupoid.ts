@@ -3,7 +3,8 @@ import { Constructor } from '../util/constructor';
 export interface ISemigroupoid<A, B> {
   'fantasy-land/compose': <C>(b: ISemigroupoid<B, C>) => ISemigroupoid<A, C>;
 }
-export interface ISemigroupoidClass<A, B> extends Constructor<ISemigroupoid<A, B>> {}
+export interface ISemigroupoidClass<A, B, ISemigroupoidAB extends ISemigroupoid<A, B>>
+  extends Constructor<ISemigroupoidAB> {}
 
 export const Associativity: <A, B, C, D>(
   a: ISemigroupoid<A, B>, b: ISemigroupoid<B, C>, c: ISemigroupoid<C, D>

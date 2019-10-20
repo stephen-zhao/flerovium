@@ -1,8 +1,9 @@
 import { Constructor } from '../util/constructor';
-import { ISemigroupoid } from './semigroupoid';
+import { ISemigroupoid, ISemigroupoidClass } from './semigroupoid';
 
 export interface ICategory<A> extends ISemigroupoid<A, A>{}
-export interface ICategoryClass<A, ICategoryA extends ICategory<A>> extends Constructor<ICategoryA> {
+export interface ICategoryClass<A, ICategoryA extends ICategory<A>>
+  extends Constructor<ICategoryA>, ISemigroupoidClass<A, A, ICategoryA> {
   'fantasy-land/id': () => ICategoryA;
 }
 
