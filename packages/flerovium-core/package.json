@@ -1,0 +1,26 @@
+{
+  "name": "flerovium-core",
+  "version": "0.1.0",
+  "description": "> TODO: description",
+  "author": "Stephen Zhao <mail@zhaostephen.com>",
+  "homepage": "https://github.com/stephen-zhao/flerovium#readme",
+  "license": "MIT",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": "https://github.com/stephen-zhao/flerovium/tree/master/packages/flerovium-core",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf lib/*",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "bugs": {
+    "url": "https://github.com/stephen-zhao/flerovium/issues"
+  }
+}
