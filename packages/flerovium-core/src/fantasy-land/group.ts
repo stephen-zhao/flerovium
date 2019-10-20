@@ -1,7 +1,9 @@
 import { Constructor } from '../util/constructor';
 import { IMonoid, IMonoidClass } from './monoid';
+import { ISemigroup } from './semigroup';
 
 export interface IGroup<A> extends IMonoid<A> {
+  'fantasy-land/concat': (b: ISemigroup<A>) => IGroup<A>;
   'fantasy-land/invert': () => IGroup<A>;
 }
 export interface IGroupClass<A, IGroupA extends IGroup<A>> 
