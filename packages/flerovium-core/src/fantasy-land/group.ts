@@ -1,23 +1,22 @@
 import { Constructor } from '../util/constructor';
 import { IMonoid, IMonoidClass } from './monoid';
-import { ISemigroup } from './semigroup';
 
-export interface IGroup<A> extends IMonoid<A> {
-  'fantasy-land/concat': (b: ISemigroup<A>) => IGroup<A>;
-  'fantasy-land/invert': () => IGroup<A>;
+export interface IGroup<Group extends IGroup<Group>> extends IMonoid<Group> {
+  'fantasy-land/concat': (b: Group) => Group;
+  'fantasy-land/invert': () => Group;
 }
-export interface IGroupClass<A, IGroupA extends IGroup<A>> 
-  extends Constructor<IGroupA>, IMonoidClass<A, IGroupA> {}
+export interface IGroupClass<Group extends IGroup<Group>>
+  extends Constructor<Group>, IMonoidClass<Group> {}
 
-export const RightInverse: <A, IGroupA extends IGroup<A>>(
-  g: IGroupA, Group: IGroupClass<A, IGroupA>
+export const RightInverse: <Group extends IGroup<Group>>(
+  g: Group, Group: IGroupClass<Group>
 ) => boolean =
 (g, Group) => {
   return g['fantasy-land/concat'](g['fantasy-land/invert']()) === Group['fantasy-land/empty']();
 }
 
-export const LeftInverse: <A, IGroupA extends IGroup<A>>(
-  g: IGroupA, Group: IGroupClass<A, IGroupA>
+export const LeftInverse: <Group extends IGroup<Group>>(
+  g: Group, Group: IGroupClass<Group>
 ) => boolean =
 (g, Group) => {
   return g['fantasy-land/invert']()['fantasy-land/concat'](g) === Group['fantasy-land/empty']();

@@ -1,13 +1,13 @@
 import { Constructor } from '../util/constructor';
 
-export interface ISemigroup<A> {
-  'fantasy-land/concat': (b: ISemigroup<A>) => ISemigroup<A>;
+export interface ISemigroup<Semigroup extends ISemigroup<Semigroup>> {
+  'fantasy-land/concat': (b: Semigroup) => Semigroup;
 }
-export interface ISemigroupClass<A, ISemigroupA extends ISemigroup<A>>
-  extends Constructor<ISemigroupA> {}
+export interface ISemigroupClass<Semigroup extends ISemigroup<Semigroup>>
+  extends Constructor<Semigroup> {}
 
-export const Associativity: <A, ISemigroupA extends ISemigroup<A>>(
-  a: ISemigroupA, b: ISemigroupA, c: ISemigroupA
+export const Associativity: <Semigroup extends ISemigroup<Semigroup>>(
+  a: Semigroup, b: Semigroup, c: Semigroup
 ) => boolean = 
 (a, b, c) => {
   return a['fantasy-land/concat'](b)['fantasy-land/concat'](c) === a['fantasy-land/concat'](c['fantasy-land/concat'](c));

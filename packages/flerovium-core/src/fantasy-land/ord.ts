@@ -1,21 +1,21 @@
 import { Constructor } from '../util/constructor';
 import { ISetoid, ISetoidClass } from './setoid';
 
-export interface IOrd<A> extends ISetoid<A> {
-  'fantasy-land/lte': (b: IOrd<A>) => boolean;
+export interface IOrd<Ord extends IOrd<Ord>> extends ISetoid<Ord> {
+  'fantasy-land/lte': (b: Ord) => boolean;
 }
-export interface IOrdClass<A, IOrdA extends IOrd<A>>
-  extends Constructor<IOrdA>, ISetoidClass<A, IOrdA> {}
+export interface IOrdClass<Ord extends IOrd<Ord>>
+  extends Constructor<Ord>, ISetoidClass<Ord> {}
 
-export const Totality: <A, IOrdA extends IOrd<A>>(
-  a: IOrdA, b: IOrdA
+export const Totality: <Ord extends IOrd<Ord>>(
+  a: Ord, b: Ord
 ) => boolean =
 (a, b) => {
   return a['fantasy-land/lte'](b) || b['fantasy-land/lte'](a);
 }
 
-export const Antisymmetry: <A, IOrdA extends IOrd<A>>(
-  a: IOrdA, b: IOrdA
+export const Antisymmetry: <Ord extends IOrd<Ord>>(
+  a: Ord, b: Ord
 ) => boolean =
 (a, b) => {
   if (a['fantasy-land/lte'](b) && b['fantasy-land/lte'](a)) {
@@ -26,8 +26,8 @@ export const Antisymmetry: <A, IOrdA extends IOrd<A>>(
   }
 }
 
-export const Transitivity: <A, IOrdA extends IOrd<A>>(
-  a: IOrdA, b: IOrdA, c: IOrdA
+export const Transitivity: <Ord extends IOrd<Ord>>(
+  a: Ord, b: Ord, c: Ord
 ) => boolean =
 (a, b, c) => {
   if (a['fantasy-land/lte'](b) && b['fantasy-land/lte'](c)) {

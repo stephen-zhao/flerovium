@@ -1,27 +1,27 @@
 import { Constructor } from '../util/constructor';
 
-export interface ISetoid<A> {
-  'fantasy-land/equals': (b: ISetoid<A>) => boolean;
+export interface ISetoid<Setoid extends ISetoid<Setoid>> {
+  'fantasy-land/equals': (b: Setoid) => boolean;
 }
-export interface ISetoidClass<A, ISetoidA extends ISetoid<A>>
-  extends Constructor<ISetoidA> {}
+export interface ISetoidClass<Setoid extends ISetoid<Setoid>>
+  extends Constructor<Setoid> {}
 
-export const Reflexivity: <A, ISetoidA extends ISetoid<A>>(
-  a: ISetoidA
+export const Reflexivity: <Setoid extends ISetoid<Setoid>>(
+  a: Setoid
 ) => boolean =
 a => {
   return a['fantasy-land/equals'](a) === true;
 }
 
-export const Symmetry: <A, ISetoidA extends ISetoid<A>>(
-  a: ISetoidA, b: ISetoidA
+export const Symmetry: <Setoid extends ISetoid<Setoid>>(
+  a: Setoid, b: Setoid
 ) => boolean =
 (a, b) => {
   return a['fantasy-land/equals'](b) === b['fantasy-land/equals'](a);
 }
 
-export const Transitivity: <A, ISetoidA extends ISetoid<A>>(
-  a: ISetoidA, b: ISetoidA, c: ISetoidA
+export const Transitivity: <Setoid extends ISetoid<Setoid>>(
+  a: Setoid, b: Setoid, c: Setoid
 ) => boolean =
 (a, b, c) => {
   if (a['fantasy-land/equals'](b) && b['fantasy-land/equals'](c)) {

@@ -1,23 +1,23 @@
 import { Constructor } from '../util/constructor';
 import { ISemigroup, ISemigroupClass } from './semigroup';
 
-export interface IMonoid<A> extends ISemigroup<A> {
-  'fantasy-land/concat': (b: ISemigroup<A>) => IMonoid<A>;
+export interface IMonoid<Monoid extends IMonoid<Monoid>> extends ISemigroup<Monoid> {
+  'fantasy-land/concat': (b: Monoid) => Monoid;
 }
-export interface IMonoidClass<A, IMonoidA extends IMonoid<A>>
-  extends Constructor<IMonoidA>, ISemigroupClass<A, IMonoidA> {
-  'fantasy-land/empty': () => IMonoid<any>;
+export interface IMonoidClass<Monoid extends IMonoid<Monoid>>
+  extends Constructor<Monoid>, ISemigroupClass<Monoid> {
+  'fantasy-land/empty': () => Monoid;
 }
 
-export const RightIdentity: <A, IMonoidA extends IMonoid<A>>(
-  m: IMonoidA, Monoid: IMonoidClass<A, IMonoidA>
+export const RightIdentity: <Monoid extends IMonoid<Monoid>>(
+  m: Monoid, Monoid: IMonoidClass<Monoid>
 ) => boolean =
 (m, Monoid) => {
   return m['fantasy-land/concat'](Monoid['fantasy-land/empty']()) === m;
 }
 
-export const LeftIdentity: <A, IMonoidA extends IMonoid<A>>(
-  m: IMonoidA, Monoid: IMonoidClass<A, IMonoidA>
+export const LeftIdentity: <Monoid extends IMonoid<Monoid>>(
+  m: Monoid, Monoid: IMonoidClass<Monoid>
 ) => boolean =
 (m, Monoid) => {
   return Monoid['fantasy-land/empty']()['fantasy-land/concat'](m) === m;
