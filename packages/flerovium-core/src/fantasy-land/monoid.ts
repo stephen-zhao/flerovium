@@ -1,24 +1,36 @@
 import { Constructor } from '../util/constructor';
-import { ISemigroup, ISemigroupClass } from './semigroup';
+import { ISemigroupClass, ISemigroup } from './semigroup';
 
-export interface IMonoid<Monoid extends IMonoid<Monoid>> extends ISemigroup<Monoid> {
-  'fantasy-land/concat': (b: Monoid) => Monoid;
+export interface IMonoid<A, ClassA extends IMonoidClass<A>> extends ISemigroup<A, ClassA> {
 }
-export interface IMonoidClass<Monoid extends IMonoid<Monoid>>
-  extends Constructor<Monoid>, ISemigroupClass<Monoid> {
-  'fantasy-land/empty': () => Monoid;
+export interface IMonoidClass<A> extends Constructor<A>, ISemigroupClass<A> {
+  'fantasy-land/empty': () => A;
 }
 
-export const RightIdentity: <Monoid extends IMonoid<Monoid>>(
-  m: Monoid, Monoid: IMonoidClass<Monoid>
+export const RightIdentity: <A extends IMonoid<A, ClassA>, ClassA extends IMonoidClass<A>>(
+  Monoid: ClassA, m: A
 ) => boolean =
-(m, Monoid) => {
-  return m['fantasy-land/concat'](Monoid['fantasy-land/empty']()) === m;
+(Monoid, m) => {
+  // Static methods
+  return (
+    Monoid['fantasy-land/concat'](m, Monoid['fantasy-land/empty']()) === m
+  )
+  // Instance methods
+  && (
+    m['fantasy-land/concat'](Monoid['fantasy-land/empty']()) === m
+  );
 }
 
-export const LeftIdentity: <Monoid extends IMonoid<Monoid>>(
-  m: Monoid, Monoid: IMonoidClass<Monoid>
+export const LeftIdentity: <A extends IMonoid<A, ClassA>, ClassA extends IMonoidClass<A>>(
+  Monoid: ClassA, m: A
 ) => boolean =
-(m, Monoid) => {
-  return Monoid['fantasy-land/empty']()['fantasy-land/concat'](m) === m;
+(Monoid, m) => {
+  // Static methods
+  return (
+    Monoid['fantasy-land/concat'](Monoid['fantasy-land/empty'](), m) === m
+  )
+  // Instance methods
+  && (
+    Monoid['fantasy-land/empty']()['fantasy-land/concat'](m) === m
+  );
 }

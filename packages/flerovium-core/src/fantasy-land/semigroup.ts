@@ -1,14 +1,24 @@
 import { Constructor } from '../util/constructor';
 
-export interface ISemigroup<Semigroup extends ISemigroup<Semigroup>> {
-  'fantasy-land/concat': (b: Semigroup) => Semigroup;
+export interface ISemigroup<A, ClassA extends ISemigroupClass<A>> {
+  'fantasy-land/concat': (b: A) => A;
 }
-export interface ISemigroupClass<Semigroup extends ISemigroup<Semigroup>>
-  extends Constructor<Semigroup> {}
+export interface ISemigroupClass<A> extends Constructor<A> { 
+  'fantasy-land/concat': (a: A, b: A) => A;
+}
 
-export const Associativity: <Semigroup extends ISemigroup<Semigroup>>(
-  a: Semigroup, b: Semigroup, c: Semigroup
+export const Associativity: <A extends ISemigroup<A, ClassA>, ClassA extends ISemigroupClass<A>>(
+  Semigroup: ClassA, a: A, b: A, c: A
 ) => boolean = 
-(a, b, c) => {
-  return a['fantasy-land/concat'](b)['fantasy-land/concat'](c) === a['fantasy-land/concat'](c['fantasy-land/concat'](c));
+(Semigroup, a, b, c) => {
+  // Static methods
+  return (
+    Semigroup['fantasy-land/concat'](Semigroup['fantasy-land/concat'](a, b), c)
+      === Semigroup['fantasy-land/concat'](a, Semigroup['fantasy-land/concat'](b, c))
+  )
+  // Instance methods
+  && (
+    a['fantasy-land/concat'](b)['fantasy-land/concat'](c)
+      === a['fantasy-land/concat'](b['fantasy-land/concat'](c))
+  );
 }

@@ -1,23 +1,37 @@
 import { Constructor } from '../util/constructor';
 import { IMonoid, IMonoidClass } from './monoid';
 
-export interface IGroup<Group extends IGroup<Group>> extends IMonoid<Group> {
-  'fantasy-land/concat': (b: Group) => Group;
-  'fantasy-land/invert': () => Group;
+export interface IGroup<A, ClassA extends IGroupClass<A>> extends IMonoid<A, ClassA> {
+  'fantasy-land/invert': () => A;
 }
-export interface IGroupClass<Group extends IGroup<Group>>
-  extends Constructor<Group>, IMonoidClass<Group> {}
-
-export const RightInverse: <Group extends IGroup<Group>>(
-  g: Group, Group: IGroupClass<Group>
-) => boolean =
-(g, Group) => {
-  return g['fantasy-land/concat'](g['fantasy-land/invert']()) === Group['fantasy-land/empty']();
+export interface IGroupClass<A> extends Constructor<A>, IMonoidClass<A> {
+  'fantasy-land/invert': (a: A) => A;
 }
 
-export const LeftInverse: <Group extends IGroup<Group>>(
-  g: Group, Group: IGroupClass<Group>
+export const RightInverse: <A extends IGroup<A, ClassA>, ClassA extends IGroupClass<A>>(
+  Group: ClassA, g: A
 ) => boolean =
-(g, Group) => {
-  return g['fantasy-land/invert']()['fantasy-land/concat'](g) === Group['fantasy-land/empty']();
+(Group, g) => {
+  // Static methods
+  return (
+    Group['fantasy-land/concat'](g, Group['fantasy-land/invert'](g)) === Group['fantasy-land/empty']()
+  )
+  // Instance methods
+  && (
+    g['fantasy-land/concat'](g['fantasy-land/invert']()) === Group['fantasy-land/empty']()
+  );
+}
+
+export const LeftInverse: <A extends IGroup<A, ClassA>, ClassA extends IGroupClass<A>>(
+  Group: ClassA, g: A
+) => boolean =
+(Group, g) => {
+  // Static methods
+  return (
+    Group['fantasy-land/concat'](Group['fantasy-land/invert'](g), g) === Group['fantasy-land/empty']()
+  )
+  // Instance methods
+  && (
+    g['fantasy-land/invert']()['fantasy-land/concat'](g) === Group['fantasy-land/empty']()
+  );
 }
