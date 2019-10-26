@@ -1,12 +1,16 @@
 import { Constructor } from '../util/constructor';
 import { IMonoid, IMonoidClass } from './monoid';
 
+// Definitions
+
 export interface IGroup<A, ClassA extends IGroupClass<A>> extends IMonoid<A, ClassA> {
   'fantasy-land/invert': () => A;
 }
 export interface IGroupClass<A> extends Constructor<A>, IMonoidClass<A> {
   'fantasy-land/invert': (a: A) => A;
 }
+
+// Laws
 
 export const RightInverse: <A extends IGroup<A, ClassA>, ClassA extends IGroupClass<A>>(
   Group: ClassA, g: A

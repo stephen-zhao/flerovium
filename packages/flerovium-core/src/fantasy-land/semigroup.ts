@@ -1,11 +1,15 @@
 import { Constructor } from '../util/constructor';
 
+// Definitions
+
 export interface ISemigroup<A, ClassA extends ISemigroupClass<A>> {
   'fantasy-land/concat': (b: A) => A;
 }
 export interface ISemigroupClass<A> extends Constructor<A> { 
   'fantasy-land/concat': (a: A, b: A) => A;
 }
+
+// Laws
 
 export const Associativity: <A extends ISemigroup<A, ClassA>, ClassA extends ISemigroupClass<A>>(
   Semigroup: ClassA, a: A, b: A, c: A
