@@ -1,39 +1,62 @@
 import { Constructor } from '../util/constructor';
 import { ISetoid, ISetoidClass } from './setoid';
 
-export interface IOrd<Ord extends IOrd<Ord>> extends ISetoid<Ord> {
-  'fantasy-land/lte': (b: Ord) => boolean;
-}
-export interface IOrdClass<Ord extends IOrd<Ord>>
-  extends Constructor<Ord>, ISetoidClass<Ord> {}
+// Definitions
 
-export const Totality: <Ord extends IOrd<Ord>>(
-  a: Ord, b: Ord
-) => boolean =
-(a, b) => {
-  return a['fantasy-land/lte'](b) || b['fantasy-land/lte'](a);
+export interface IOrd<A, ClassA extends IOrdClass<A>> extends ISetoid<A, ClassA> {
+  'fantasy-land/lte': (b: A) => boolean;
+}
+export interface IOrdClass<A> extends Constructor<A>, ISetoidClass<A> {
+  'fantasy-land/lte': (a: A, b: A) => boolean;
 }
 
-export const Antisymmetry: <Ord extends IOrd<Ord>>(
-  a: Ord, b: Ord
+// Laws
+
+export const Totality: <A extends IOrd<A, ClassA>, ClassA extends IOrdClass<A>>(
+  Ord: ClassA, a: A, b: A
 ) => boolean =
-(a, b) => {
-  if (a['fantasy-land/lte'](b) && b['fantasy-land/lte'](a)) {
-    return a['fantasy-land/equals'](b);
-  }
-  else {
-    return true;
-  }
+(Ord, a, b) => {
+  // Static methods
+  return (
+    Ord['fantasy-land/lte'](a, b) || Ord['fantasy-land/lte'](b, a)
+  )
+  // Instance methods
+  && (
+    a['fantasy-land/lte'](b) || b['fantasy-land/lte'](a)
+  );
 }
 
-export const Transitivity: <Ord extends IOrd<Ord>>(
-  a: Ord, b: Ord, c: Ord
+export const Antisymmetry: <A extends IOrd<A, ClassA>, ClassA extends IOrdClass<A>>(
+  Ord: ClassA, a: A, b: A
 ) => boolean =
-(a, b, c) => {
-  if (a['fantasy-land/lte'](b) && b['fantasy-land/lte'](c)) {
-    return a['fantasy-land/lte'](c);
-  }
-  else {
-    return true;
-  }
+(Ord, a, b) => {
+  // Static methods
+  return (
+    (Ord['fantasy-land/lte'](a, b) && Ord['fantasy-land/lte'](b, a))
+      ? Ord['fantasy-land/equals'](a, b)
+      : true
+  )
+  // Instance methods
+  && (
+    (a['fantasy-land/lte'](b) && b['fantasy-land/lte'](a))
+      ? a['fantasy-land/equals'](b)
+      : true
+  );
+}
+
+export const Transitivity: <A extends IOrd<A, ClassA>, ClassA extends IOrdClass<A>>(
+  Ord: ClassA, a: A, b: A, c: A
+) => boolean =
+(Ord, a, b, c) => {
+  return (
+    (Ord['fantasy-land/lte'](a, b) && Ord['fantasy-land/lte'](b, c))
+      ? Ord['fantasy-land/lte'](a, c)
+      : true
+  )
+  // Instance methods
+  && (
+    (a['fantasy-land/lte'](b) && b['fantasy-land/lte'](c))
+      ? a['fantasy-land/lte'](c)
+      : true
+  );
 }

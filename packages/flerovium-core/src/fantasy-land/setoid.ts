@@ -1,33 +1,58 @@
 import { Constructor } from '../util/constructor';
 
-export interface ISetoid<Setoid extends ISetoid<Setoid>> {
-  'fantasy-land/equals': (b: Setoid) => boolean;
-}
-export interface ISetoidClass<Setoid extends ISetoid<Setoid>>
-  extends Constructor<Setoid> {}
+// Definitions
 
-export const Reflexivity: <Setoid extends ISetoid<Setoid>>(
-  a: Setoid
-) => boolean =
-a => {
-  return a['fantasy-land/equals'](a) === true;
+export interface ISetoid<A, ClassA extends ISetoidClass<A>> {
+  'fantasy-land/equals': (b: A) => boolean;
+}
+export interface ISetoidClass<A> extends Constructor<A> {
+  'fantasy-land/equals': (a: A, b: A) => boolean;
 }
 
-export const Symmetry: <Setoid extends ISetoid<Setoid>>(
-  a: Setoid, b: Setoid
+// Laws
+
+export const Reflexivity: <A extends ISetoid<A, ClassA>, ClassA extends ISetoidClass<A>>(
+  Setoid: ClassA, a: A
 ) => boolean =
-(a, b) => {
-  return a['fantasy-land/equals'](b) === b['fantasy-land/equals'](a);
+(Setoid, a) => {
+  // Static methods
+  return (
+    Setoid['fantasy-land/equals'](a, a) === true
+  )
+  // Instance methods
+  && (
+    a['fantasy-land/equals'](a) === true
+  );
 }
 
-export const Transitivity: <Setoid extends ISetoid<Setoid>>(
-  a: Setoid, b: Setoid, c: Setoid
+export const Symmetry: <A extends ISetoid<A, ClassA>, ClassA extends ISetoidClass<A>>(
+  Setoid: ClassA, a: A, b: A
 ) => boolean =
-(a, b, c) => {
-  if (a['fantasy-land/equals'](b) && b['fantasy-land/equals'](c)) {
-    return a['fantasy-land/equals'](c);
-  }
-  else {
-    return true;
-  }
+(Setoid, a, b) => {
+  // Static methods
+  return (
+    Setoid['fantasy-land/equals'](a, b) === Setoid['fantasy-land/equals'](b, a)
+  )
+  // Instance methods
+  && (
+    a['fantasy-land/equals'](b) === b['fantasy-land/equals'](a)
+  );
+}
+
+export const Transitivity: <A extends ISetoid<A, ClassA>, ClassA extends ISetoidClass<A>>(
+  Setoid: ClassA, a: A, b: A, c: A
+) => boolean =
+(Setoid, a, b, c) => {
+  // Static methods
+  return (
+    (Setoid['fantasy-land/equals'](a, b) && Setoid['fantasy-land/equals'](b, c))
+      ? Setoid['fantasy-land/equals'](a, c)
+      : true
+  )
+  // Instance methods
+  && (
+    (a['fantasy-land/equals'](b) && b['fantasy-land/equals'](c))
+      ? a['fantasy-land/equals'](c)
+      : true
+  );
 }
