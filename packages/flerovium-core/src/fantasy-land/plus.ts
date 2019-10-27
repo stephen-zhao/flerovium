@@ -1,33 +1,93 @@
 import { Constructor } from '../util/constructor';
-import { IAlt, IAltClass } from './alt';
+import { IAlt, IAltClass, isIAlt } from './alt';
 
-export interface IPlus<A> extends IAlt<A> {
-  'fantasy-land/map': <B>(f: (_: A) => B) => IPlus<B>;
-  'fantasy-land/alt': (a: IAlt<A>) => IPlus<A>;
+// Definitions
+
+export interface IPlus<
+  A,
+  FA extends IPlus<A, FA, ClassFA>,
+  ClassFA extends IPlusClass<A, FA>
+> extends IAlt<A, FA, ClassFA> {
 }
-export interface IPlusClass<A, IPlusA extends IPlus<A>>
-  extends Constructor<IPlusA>, IAltClass<A, IPlusA> {
-  'fantasy-land/zero': () => IPlus<any>;
+export interface IPlusClass<A, FA> extends Constructor<FA>, IAltClass<A, FA> {
+  'fantasy-land/zero': () => FA;
+}
+export function isIPlus<
+  A,
+  FA extends IPlus<A, FA, ClassFA>,
+  ClassFA extends IPlusClass<A, FA>
+>(fa: any): fa is IPlus<A, FA, ClassFA> {
+  if (fa === undefined || fa === null) {
+    return false;
+  }
+  else {
+    return isIAlt(fa);
+  }
 }
 
-export const RightIdentity: <A, IPlusA extends IPlus<A>>(
-  x: IPlusA, Plus: IPlusClass<A, IPlusA>
+// Laws
+
+export const RightIdentity: <A, FA extends IPlus<A, FA, ClassFA>, ClassFA extends IPlusClass<A, FA>>(
+  Plus: ClassFA, x: FA
 ) => boolean =
-(x, Plus) => {
-  return x['fantasy-land/alt'](Plus['fantasy-land/zero']()) === x;
+(Plus, x) => {
+  // Static methods
+  return (
+    Plus['fantasy-land/equals'](
+      Plus['fantasy-land/alt'](x, Plus['fantasy-land/zero']()),
+      x
+    )
+  )
+  // Instance methods
+  && (
+    Plus['fantasy-land/equals'](
+      x['fantasy-land/alt'](Plus['fantasy-land/zero']()),
+      x
+    )
+  );
 }
 
-export const LeftIdentity: <A, IPlusA extends IPlus<A>>(
-  x: IPlusA, Plus: IPlusClass<A, IPlusA>
+export const LeftIdentity: <A, FA extends IPlus<A, FA, ClassFA>, ClassFA extends IPlusClass<A, FA>>(
+  Plus: ClassFA, x: FA
 ) => boolean =
-(x, Plus) => {
-  return Plus['fantasy-land/zero']()['fantasy-land/alt'](x) === x;
+(Plus, x) => {
+  // Static methods
+  return (
+    Plus['fantasy-land/equals'](
+      Plus['fantasy-land/alt'](Plus['fantasy-land/zero'](), x),
+      x
+    )
+  )
+  // Instance methods
+  && (
+    Plus['fantasy-land/equals'](
+      Plus['fantasy-land/zero']()['fantasy-land/alt'](x),
+      x
+    )
+  );
 }
 
-export const Annihilation: <A, B>(
-  Plus: IPlusClass<A, IPlus<A>>,
+export const Annihilation: <
+  A, FA extends IPlus<A, FA, ClassFA>, ClassFA extends IPlusClass<A, FA>,
+  B, FB extends IPlus<B, FB, ClassFB>, ClassFB extends IPlusClass<B, FB>,
+>(
+  PlusA: ClassFA,
+  PlusB: ClassFB,
   f: (_: A) => B
 ) => boolean =
-(Plus, f) => {
-  return Plus['fantasy-land/zero']()['fantasy-land/map'](f) === Plus['fantasy-land/zero']();
+(PlusA, PlusB, f) => {
+  // Static methods
+  return (
+    PlusB['fantasy-land/equals'](
+      PlusA['fantasy-land/map'](PlusA['fantasy-land/zero'](), f),
+      PlusB['fantasy-land/zero']()
+    )
+  )
+  // Instance methods
+  && (
+    PlusB['fantasy-land/equals'](
+      PlusA['fantasy-land/zero']()['fantasy-land/map'](f),
+      PlusB['fantasy-land/zero']()
+    )
+  );
 }

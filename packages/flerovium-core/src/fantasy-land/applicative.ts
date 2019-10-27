@@ -1,39 +1,104 @@
 import { Constructor } from '../util/constructor';
-import { IApply, IApplyClass } from './apply';
+import { IApply, IApplyClass, isIApply } from './apply';
 
-export interface IApplicative<A> extends IApply<A> {
-  'fantasy-land/ap': <B>(f: IApply<(_: A) => B>) => IApplicative<B>;
-  'fantasy-land/map': <B>(f: (_: A) => B) => IApplicative<B>;
-} 
-export interface IApplicativeClass<A, IApplicativeA extends IApplicative<A>>
-  extends Constructor<IApplicativeA>, IApplyClass<A, IApplicativeA> {
-  'fantasy-land/of': (a: A) => IApplicative<A>;
+// Definitions
+
+export interface IApplicative<
+  A,
+  FA extends IApplicative<A, FA, ClassFA>,
+  ClassFA extends IApplicativeClass<A, FA>
+> extends IApply<A, FA, ClassFA> {
+}
+export interface IApplicativeClass<A, FA> extends Constructor<FA>, IApplyClass<A, FA> {
+  'fantasy-land/of': (a: A) => FA;
+}
+export function isIApplicative<
+  A,
+  FA extends IApplicative<A, FA, ClassFA>,
+  ClassFA extends IApplicativeClass<A, FA>
+>(fa: any): fa is IApplicative<A, FA, ClassFA> {
+  if (fa === undefined || fa === null) {
+    return false;
+  }
+  else {
+    return isIApply(fa);
+  }
 }
 
-type I<A> = (x: A) => A;
-export const Identity: <A>(
-  v: IApplicative<A>, Applicative: IApplicativeClass<I<A>, IApplicative<I<A>>>
+// Laws
+
+type AtoB<A, B> = (_: A) => B;
+type ABtoB<A, B> = (_: (_: A) => B) => B;
+
+export const Identity: <
+  A, FA extends IApplicative<A, FA, ClassFA>, ClassFA extends IApplicativeClass<A, FA>,
+  FAtoA extends IApplicative<(_: A) => A, FAtoA, ClassFAtoA>, ClassFAtoA extends IApplicativeClass<(_: A) => A, FAtoA>
+>(
+  ApplicativeA: ClassFA, ApplicativeAtoA: ClassFAtoA,
+  fa: FA
 ) => boolean =
-(v, Applicative) => {
-  return v['fantasy-land/ap'](Applicative['fantasy-land/of'](x => x)) === v;
+(ApplicativeA, ApplicativeAtoA, fa) => {
+  // Static methods
+  return (
+    ApplicativeA['fantasy-land/equals'](
+      ApplicativeA['fantasy-land/ap'](fa, ApplicativeAtoA['fantasy-land/of'](x => x)),
+      fa
+    )
+  )
+  // Instance methods
+  && (
+    ApplicativeA['fantasy-land/equals'](
+      fa['fantasy-land/ap'](ApplicativeAtoA['fantasy-land/of'](x => x)),
+      fa
+    )
+  );
 }
 
-export const Homomorphism: <A, B>(
-  x: A, ApplicativeA: IApplicativeClass<A, IApplicative<A>>,
-  ApplicativeB: IApplicativeClass<B, IApplicative<B>>,
-  f: (_: A) => B, ApplicativeF: IApplicativeClass<(_: A) => B, IApplicative<(_: A) => B>>
+export const Homomorphism: <
+  A, FA extends IApplicative<A, FA, ClassFA>, ClassFA extends IApplicativeClass<A, FA>,
+  B, FB extends IApplicative<B, FB, ClassFB>, ClassFB extends IApplicativeClass<B, FB>,
+  FAtoB extends IApplicative<AtoB<A, B>, FAtoB, ClassFAtoB>, ClassFAtoB extends IApplicativeClass<AtoB<A, B>, FAtoB>
+>(
+  ApplicativeA: ClassFA, ApplicativeB: ClassFB, ApplicativeF: ClassFAtoB,
+  a: A, f: AtoB<A, B>
 ) => boolean =
-(x, ApplicativeA, ApplicativeB, f, ApplicativeF) => {
-  return ApplicativeA['fantasy-land/of'](x)['fantasy-land/ap'](ApplicativeF['fantasy-land/of'](f))
-    === ApplicativeB['fantasy-land/of'](f(x));
+(ApplicativeA, ApplicativeB, ApplicativeF, a, f, ) => {
+  // Static methods
+  return ApplicativeB['fantasy-land/equals'](
+    ApplicativeA['fantasy-land/ap'](ApplicativeA['fantasy-land/of'](a), ApplicativeF['fantasy-land/of'](f)),
+    ApplicativeB['fantasy-land/of'](f(a))
+  )
+  // Instance methods
+  && (
+    ApplicativeB['fantasy-land/equals'](
+      ApplicativeA['fantasy-land/of'](a)['fantasy-land/ap'](ApplicativeF['fantasy-land/of'](f)),
+      ApplicativeB['fantasy-land/of'](f(a))
+    )
+  );
 }
 
-export const Interchange: <A, B>(
-  y: A, ApplicativeA: IApplicativeClass<A, IApplicative<A>>,
-  u: IApplicative<(_: A) => B>,
-  ApplicativeF: IApplicativeClass<(f: (_: A) => B) => B, IApplicative<(f: (_: A) => B) => B>>
+export const Interchange: <
+  A, FA extends IApplicative<A, FA, ClassFA>, ClassFA extends IApplicativeClass<A, FA>,
+  B, FB extends IApplicative<B, FB, ClassFB>, ClassFB extends IApplicativeClass<B, FB>,
+  FAtoB extends IApplicative<AtoB<A, B>, FAtoB, ClassFAtoB>, ClassFAtoB extends IApplicativeClass<AtoB<A, B>, FAtoB>,
+  FABtoB extends IApplicative<ABtoB<A, B>, FABtoB, ClassFABtoB>, ClassFABtoB extends IApplicativeClass<ABtoB<A, B>, FABtoB>
+>(
+  ApplicativeA: ClassFA, ApplicativeB: ClassFB, ApplicativeAtoB: ClassFAtoB, ApplicativeABtoB: ClassFABtoB,
+  a: A, fab: FAtoB
 ) => boolean =
-(y, ApplicativeA, u, ApplicativeF) => {
-  return ApplicativeA['fantasy-land/of'](y)['fantasy-land/ap'](u)
-    === u['fantasy-land/ap'](ApplicativeF['fantasy-land/of'](f => f(y)));
+(ApplicativeA, ApplicativeB, ApplicativeAtoB, ApplicativeABtoB, a, fab) => {
+  // Static methods
+  return (
+    ApplicativeB['fantasy-land/equals'](
+      ApplicativeA['fantasy-land/ap'](ApplicativeA['fantasy-land/of'](a), fab),
+      ApplicativeAtoB['fantasy-land/ap'](fab, ApplicativeABtoB['fantasy-land/of'](f => f(a)))
+    )
+  )
+  // Instance methods
+  && (
+    ApplicativeB['fantasy-land/equals'](
+      ApplicativeA['fantasy-land/of'](a)['fantasy-land/ap'](fab),
+      fab['fantasy-land/ap'](ApplicativeABtoB['fantasy-land/of'](f => f(a)))
+    )
+  );
 }
