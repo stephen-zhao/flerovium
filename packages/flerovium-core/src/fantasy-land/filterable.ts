@@ -1,28 +1,86 @@
 import { Constructor } from '../util/constructor';
+import { ISetoid, ISetoidClass, isISetoid } from './setoid';
 
-export interface IFilterable<A> {
-  'fantasy-land/filter': (pred: (_: A) => boolean) => IFilterable<A>;
+// Definitions
+
+export interface IFilterable<
+  A,
+  FA extends IFilterable<A, FA, ClassFA>,
+  ClassFA extends IFilterableClass<A, FA>
+> extends ISetoid<FA, ClassFA> {
+  'fantasy-land/filter': (pred: (_: A) => boolean) => FA;
 }
-export interface IFilterableClass<FilterableA extends IFilterable<A>, A>
-  extends Constructor<FilterableA> {}
-
-export const Distributivity: <A>(
-  v: IFilterable<A>, p: (_: A) => boolean, q: (_: A) => boolean
-) => boolean =
-(v, p, q) => {
-  return v['fantasy-land/filter'](x => p(x) && q(x)) === v['fantasy-land/filter'](p)['fantasy-land/filter'](q);
+export interface IFilterableClass<A, FA> extends Constructor<FA>, ISetoidClass<FA> {
+  'fantasy-land/filter': (a: FA, pred: (_: A) => boolean) => FA;
+}
+export function IsIFilterable<
+  A,
+  FA extends IFilterable<A, FA, ClassFA>,
+  ClassFA extends IFilterableClass<A, FA>
+>(fa: any): fa is IFilterable<A, FA, ClassFA> {
+  if (fa === undefined || fa === null) {
+    return false;
+  }
+  else {
+    return isISetoid(fa) && (fa as Object).hasOwnProperty('fantasy-land/filter');
+  }
 }
 
-export const Identity: <A>(
-  v: IFilterable<A>
+// Laws
+
+export const Distributivity: <A, FA extends IFilterable<A, FA, ClassFA>, ClassFA extends IFilterableClass<A, FA>>(
+  Filterable: ClassFA, v: FA, p: (_: A) => boolean, q: (_: A) => boolean
 ) => boolean =
-v => {
-  return v['fantasy-land/filter'](x => true) === v;
+(Filterable, v, p, q) => {
+  // Static methods
+  return (
+    Filterable['fantasy-land/equals'](
+      Filterable['fantasy-land/filter'](v, x => p(x) && q(x)),
+      Filterable['fantasy-land/filter'](Filterable['fantasy-land/filter'](v, p), q)
+    )
+  )
+  // Instance methods
+  && (
+    Filterable['fantasy-land/equals'](
+      v['fantasy-land/filter'](x => p(x) && q(x)),
+      v['fantasy-land/filter'](p)['fantasy-land/filter'](q)
+    )
+  );
 }
 
-export const Annihilation: <FilterableA extends IFilterable<A>, A>(
-  v: FilterableA, w: FilterableA
+export const Identity: <A, FA extends IFilterable<A, FA, ClassFA>, ClassFA extends IFilterableClass<A, FA>>(
+  Filterable: ClassFA, v: FA
 ) => boolean =
-(v, w) => {
-  return v['fantasy-land/filter'](x => false) === w['fantasy-land/filter'](x => false);
+(Filterable, v) => {
+  // Static methods
+  return (
+    Filterable['fantasy-land/equals'](
+      Filterable['fantasy-land/filter'](v, x => true), v
+    )
+  )
+  // Instance methods
+  && (
+    Filterable['fantasy-land/equals'](
+      v['fantasy-land/filter'](x => true), v
+    )
+  )
+}
+
+export const Annihilation: <A, FA extends IFilterable<A, FA, ClassFA>, ClassFA extends IFilterableClass<A, FA>>(
+  Filterable: ClassFA, v: FA, w: FA
+) => boolean =
+(Filterable, v, w) => {
+  // Static methods
+  return (
+    Filterable['fantasy-land/equals'](
+      Filterable['fantasy-land/filter'](v, x => false),
+      Filterable['fantasy-land/filter'](w, x => false))
+  )
+  // Instance methods
+  && (
+    Filterable['fantasy-land/equals'](
+      v['fantasy-land/filter'](x => false),
+      w['fantasy-land/filter'](x => false)
+    )
+  );
 }
