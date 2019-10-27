@@ -1,5 +1,5 @@
 import { Constructor } from '../util/constructor';
-import { ISemigroupClass, ISemigroup } from './semigroup';
+import { ISemigroupClass, ISemigroup, isISemigroup } from './semigroup';
 
 // Definitions
 
@@ -7,6 +7,14 @@ export interface IMonoid<A, ClassA extends IMonoidClass<A>> extends ISemigroup<A
 }
 export interface IMonoidClass<A> extends Constructor<A>, ISemigroupClass<A> {
   'fantasy-land/empty': () => A;
+}
+export function isIMonoid<A, ClassA extends IMonoidClass<A>>(a: any): a is IMonoid<A, ClassA> {
+  if (a === undefined || a === null) {
+    return false;
+  }
+  else {
+    return isISemigroup(a);
+  }
 }
 
 // Laws

@@ -1,5 +1,5 @@
 import { Constructor } from '../util/constructor';
-import { IMonoid, IMonoidClass } from './monoid';
+import { IMonoid, IMonoidClass, isIMonoid } from './monoid';
 
 // Definitions
 
@@ -8,6 +8,14 @@ export interface IGroup<A, ClassA extends IGroupClass<A>> extends IMonoid<A, Cla
 }
 export interface IGroupClass<A> extends Constructor<A>, IMonoidClass<A> {
   'fantasy-land/invert': (a: A) => A;
+}
+export function isIGroup<A, ClassA extends IGroupClass<A>>(a: any): a is IGroup<A, ClassA> {
+  if (a === undefined || a === null) {
+    return false;
+  }
+  else {
+    return isIMonoid(a) && (a as Object).hasOwnProperty('fantasy-land/invert');
+  }
 }
 
 // Laws

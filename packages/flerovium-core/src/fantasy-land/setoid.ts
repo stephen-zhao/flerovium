@@ -8,6 +8,14 @@ export interface ISetoid<A, ClassA extends ISetoidClass<A>> {
 export interface ISetoidClass<A> extends Constructor<A> {
   'fantasy-land/equals': (a: A, b: A) => boolean;
 }
+export function isISetoid<A, ClassA extends ISetoidClass<A>>(a: any): a is ISetoid<A, ClassA> {
+  if (a === undefined || a === null) {
+    return false;
+  }
+  else {
+    return (a as Object).hasOwnProperty('fantasy-land/equals');
+  }
+}
 
 // Laws
 

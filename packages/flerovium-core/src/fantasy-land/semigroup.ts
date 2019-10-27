@@ -8,6 +8,14 @@ export interface ISemigroup<A, ClassA extends ISemigroupClass<A>> {
 export interface ISemigroupClass<A> extends Constructor<A> { 
   'fantasy-land/concat': (a: A, b: A) => A;
 }
+export function isISemigroup<A, ClassA extends ISemigroupClass<A>>(a: any): a is ISemigroup<A, ClassA> {
+  if (a === undefined || a === null) {
+    return false;
+  }
+  else {
+    return (a as Object).hasOwnProperty('fantasy-land/concat');
+  }
+}
 
 // Laws
 

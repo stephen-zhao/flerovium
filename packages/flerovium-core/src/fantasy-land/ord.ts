@@ -1,5 +1,5 @@
 import { Constructor } from '../util/constructor';
-import { ISetoid, ISetoidClass } from './setoid';
+import { ISetoid, ISetoidClass, isISetoid } from './setoid';
 
 // Definitions
 
@@ -8,6 +8,14 @@ export interface IOrd<A, ClassA extends IOrdClass<A>> extends ISetoid<A, ClassA>
 }
 export interface IOrdClass<A> extends Constructor<A>, ISetoidClass<A> {
   'fantasy-land/lte': (a: A, b: A) => boolean;
+}
+export function isIOrd<A, ClassA extends IOrdClass<A>>(a: any): a is IOrd<A, ClassA> {
+  if (a === undefined || a === null) {
+    return false;
+  }
+  else {
+    return isISetoid(a) && (a as Object).hasOwnProperty('fantasy-land/lte');
+  }
 }
 
 // Laws
