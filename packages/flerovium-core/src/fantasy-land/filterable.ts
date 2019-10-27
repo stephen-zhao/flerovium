@@ -13,7 +13,7 @@ export interface IFilterable<
 export interface IFilterableClass<A, FA> extends Constructor<FA>, ISetoidClass<FA> {
   'fantasy-land/filter': (a: FA, pred: (_: A) => boolean) => FA;
 }
-export function IsIFilterable<
+export function isIFilterable<
   A,
   FA extends IFilterable<A, FA, ClassFA>,
   ClassFA extends IFilterableClass<A, FA>

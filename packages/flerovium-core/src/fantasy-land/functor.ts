@@ -13,7 +13,7 @@ export interface IFunctor<
 export interface IFunctorClass<A, FA> extends Constructor<FA>, ISetoidClass<FA> {
   'fantasy-land/map': <B, FB extends IFunctor<B, FB, ClassFB>, ClassFB extends IFunctorClass<B, FB>>(fa: FA, f: (_: A) => B) => FB;
 }
-export function IsIFunctor<
+export function isIFunctor<
   A,
   FA extends IFunctor<A, FA, ClassFA>,
   ClassFA extends IFunctorClass<A, FA>

@@ -1,19 +1,19 @@
-import { IFunctor, IFunctorClass, IsIFunctor } from './functor';
+import { IFunctor, IFunctorClass, isIFunctor } from './functor';
 import { Constructor } from '../util/constructor';
 
 // Definitions
 
 export interface IAlt<
-A,
-FA extends IFunctor<A, FA, ClassFA>,
-ClassFA extends IFunctorClass<A, FA>
+  A,
+  FA extends IAlt<A, FA, ClassFA>,
+  ClassFA extends IAltClass<A, FA>
 > extends IFunctor<A, FA, ClassFA> {
   'fantasy-land/alt': (b: FA) => FA;
 }
 export interface IAltClass<A, FA> extends Constructor<FA>, IFunctorClass<A, FA> {
   'fantasy-land/alt': (a: FA, b: FA) => FA;
 }
-export function IsIAlt<
+export function isIAlt<
   A,
   FA extends IAlt<A, FA, ClassFA>,
   ClassFA extends IAltClass<A, FA>
@@ -22,7 +22,7 @@ export function IsIAlt<
     return false;
   }
   else {
-    return IsIFunctor(fa) && (fa as Object).hasOwnProperty('fantasy-land/alt');
+    return isIFunctor(fa) && (fa as Object).hasOwnProperty('fantasy-land/alt');
   }
 }
 
